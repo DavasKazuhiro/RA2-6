@@ -45,6 +45,83 @@ data LogEntry = LogEntry
   , status    :: StatusLog
   } deriving (Show, Read)
 
+type ResultadoOperacao = (Inventario, LogEntry)
+
+
+
+addItem :: UTCTime -> Inventario -> Item -> Either String ResultadoOperacao
+addItem t inventario item
+  | Map.member (itemID item) inventario =
+      let logEntry = LogEntry
+            { timestamp = t,
+            acao      = Add,
+            detalhes  = "Tentativa de adicionar item que já existente: " ++ show item,
+            status    = Falha "Item já existe no inventário",
+            }
+      in Right (inventario, logEntry)
+  | otherwise =
+      let inventarioNovo = Map.insert (itemID item) item inventario
+          logEntry = LogEntry
+            { timestamp = t,
+            acao      = Add,
+            detalhes  = "Adicionado: " ++ show item,
+            status    = Sucesso
+            }
+      in Right (inventarioNovo, logEntry)
+
+
+
+removeItem :: UTCTime -> Inventario -> String -> Either String ResultadoOperacao
+removeItem t inventario chave
+  | not (Map.member chave inventario) =
+      let logEntry = LogEntry
+            { timestamp = t,
+            acao      = Remove,
+            detalhes  = "Tentativa de remover item que não existe: " ++ chave,
+            status    = Falha "Item não encontrado para remoção"
+            }
+      in Right (inventario, logEntry)
+  | otherwise =
+      let inventarioNovo = Map.delete chave inventario
+          logEntry = LogEntry
+            { timestamp = t,
+            acao      = Remove,
+            detalhes  = "Item removido: " ++ chave,
+            status    = Sucesso
+            }
+      in Right (inventarioNovo, logEntry)
+     
+     
+
+updateQty :: UTCTime -> Inventario -> String -> Int -> Either String ResultadoOperacao
+updateQty t inventario chave novaQtd
+  | not (Map.member chave inventario) =
+      let logEntry = LogEntry
+            { timestamp = t,
+            acao      = Update,
+            detalhes  = "Tentativa de atualizar item que não existe: " ++ chave,
+            status    = Falha "Item não encontrado para atualização"
+            }
+      in Right (inventario, logEntry)
+  | otherwise =
+      let Just item = Map.lookup chave inventario
+          itemAtualizado = item { quantidade = novaQtd }
+          inventarioNovo = Map.insert chave itemAtualizado inventario
+          logEntry = LogEntry
+            { timestamp = t,
+            acao      = Update,
+            detalhes  = "Quantidade atualizada para " ++ show novaQtd ++ " em " ++ chave,
+            status    = Sucesso
+            }
+      in Right (inventarioNovo, logEntry)
+ 
+      
+      
+      
+      
+
+
+
 main :: IO ()
 main = do
   putStrLn "tipos basicos"
