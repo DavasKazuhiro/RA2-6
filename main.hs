@@ -137,3 +137,23 @@ main = do
                 handler _ = do
                     putStrLn "Arquivo Inventario.dat não encontrado. Iniciando inventário vazio..."
                     return ""
+
+
+        loop :: Inventario -> IO ()
+        loop inventario = do
+            putStr "\nComando (add/remove/update/show/exit): "
+            hFlush stdout
+            comando <- getLine
+            chamarComando comando inventario
+
+        
+        chamarComando :: String -> Inventario -> IO()
+        chamarComando comando inventario
+            | comando == "add"    = chamarAdd inventario
+            | comando == "remove" = chamarRemove inventario
+            | comando == "update" = chamarUpdate inventario
+            | comando == "show"   = chamarShow inventario
+            | comando == "exit"   = chamarExit inventario
+            | otherwise           = chamarInvalido inventario
+            
+
