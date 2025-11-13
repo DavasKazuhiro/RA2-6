@@ -110,51 +110,144 @@ updateQty t inventario chave novaQtd
             }
       in Right (inventarioNovo, logEntry)
 
--- PONTO DE ENTRADA
+
 main :: IO ()
 main = do
     putStrLn "=== Sistema de Inventário ==="
     inventario <- lerInventario
     lerAuditoria
     loop inventario
-    where
+  where
     -- FUNCOES DE INICIALIZACAO
-    
-        lerAuditoria :: IO ()
-        lerAuditoria = do
-            existe <- doesFileExist "Auditoria.log"
-            if existe
-              then putStrLn "Arquivo de Auditoria encontrado."
-              else putStrLn "Arquivo de Auditoria não encontrado."
-        
-        lerInventario :: IO Inventario
-        lerInventario = do
-            conteudo <- readFile "Inventario.dat" `catch` handler
-            case readMaybe conteudo of
-                Just inv -> return inv
-                Nothing  -> return Map.empty
-            where
-                handler :: IOException -> IO String
-                handler _ = do
-                    putStrLn "Arquivo Inventario.dat não encontrado. Iniciando inventário vazio..."
-                    return ""
 
+    lerAuditoria :: IO ()
+    lerAuditoria = do
+        existe <- doesFileExist "Auditoria.log"
+        if existe
+          then putStrLn "Arquivo de Auditoria encontrado."
+          else putStrLn "Arquivo de Auditoria não encontrado."
 
-        loop :: Inventario -> IO ()
-        loop inventario = do
-            putStr "\nComando (add/remove/update/show/exit): "
-            hFlush stdout
-            comando <- getLine
-            chamarComando comando inventario
+    lerInventario :: IO Inventario
+    lerInventario = do
+        conteudo <- readFile "Inventario.dat" `catch` handler
+        case readMaybe conteudo of
+            Just inv -> return inv
+            Nothing  -> return Map.empty
+      where
+        handler :: IOException -> IO String
+        handler _ = do
+            putStrLn "Arquivo Inventario.dat não encontrado. Iniciando inventário vazio..."
+            return ""
 
-        
-        chamarComando :: String -> Inventario -> IO()
+    -- FUNCOES DE PERSISTENCIA
+
+    salvarInventario :: Inventario -> IO ()
+    salvarInventario inv = writeFile "Inventario.dat" (show inv)
+
+    salvarLog :: LogEntry -> IO ()
+    salvarLog logEntry = appendFile "Auditoria.log" (show logEntry ++ "\n")
+
+    -- LOOP PRINCIPAL
+
+    loop :: Inventario -> IO ()
+    loop inventario = do
+        putStr "\nComando (add/remove/update/show/exit): "
+        hFlush stdout
+        comando <- getLine
         chamarComando comando inventario
-            | comando == "add"    = chamarAdd inventario
-            | comando == "remove" = chamarRemove inventario
-            | comando == "update" = chamarUpdate inventario
-            | comando == "show"   = chamarShow inventario
-            | comando == "exit"   = chamarExit inventario
-            | otherwise           = chamarInvalido inventario
-            
 
+    chamarComando :: String -> Inventario -> IO ()
+    chamarComando comando inventario
+        | comando == "add"    = chamarAdd inventario
+        | comando == "remove" = chamarRemove inventario
+        | comando == "update" = chamarUpdate inventario
+        | comando == "show"   = chamarShow inventario
+        | comando == "exit"   = chamarExit inventario
+        | otherwise           = chamarInvalido inventario
+
+    -- COMANDOS DO LOOP
+
+    -- CHAMAR ADICIONAR
+    chamarAdd :: Inventario -> IO ()
+    chamarAdd inventario = do
+        putStr "ID: " >> hFlush stdout
+        idItem <- getLine
+        putStr "Nome: " >> hFlush stdout
+        nome <- getLine
+        putStr "Quantidade: " >> hFlush stdout
+        qtdStr <- getLine
+        putStr "Categoria: " >> hFlush stdout
+        categoria <- getLine
+        let qtd = read qtdStr :: Int
+        tempo <- getCurrentTime
+        let item = Item idItem nome qtd categoria
+        case addItem tempo inventario item of
+            Left erro -> do
+                putStrLn ("Erro: " ++ erro)
+                let logFalha = LogEntry tempo Add ("Falha ao adicionar: " ++ idItem) (Falha erro)
+                salvarLog logFalha
+                loop inventario
+            Right (novoInv, logEntry) -> do
+                salvarInventario novoInv
+                salvarLog logEntry
+                putStrLn "Item adicionado com sucesso!"
+                loop novoInv
+
+    -- CHAMAR REMOVER
+    chamarRemove :: Inventario -> IO ()
+    chamarRemove inventario = do
+        putStr "ID a remover: " >> hFlush stdout
+        idRemover <- getLine
+        tempo <- getCurrentTime
+        case removeItem tempo inventario idRemover of
+            Left erro -> do
+                putStrLn ("Erro: " ++ erro)
+                let logFalha = LogEntry tempo Remove ("Falha ao remover: " ++ idRemover) (Falha erro)
+                salvarLog logFalha
+                loop inventario
+            Right (novoInv, logEntry) -> do
+                salvarInventario novoInv
+                salvarLog logEntry
+                putStrLn "Item removido com sucesso!"
+                loop novoInv
+
+    -- CHAMAR ATUALIZAR
+    chamarUpdate :: Inventario -> IO ()
+    chamarUpdate inventario = do
+        putStr "ID: " >> hFlush stdout
+        idItem <- getLine
+        putStr "Nova quantidade: " >> hFlush stdout
+        qtdStr <- getLine
+        tempo <- getCurrentTime
+        let novaQtd = read qtdStr :: Int
+        case updateQty tempo inventario idItem novaQtd of
+            Left erro -> do
+                putStrLn ("Erro: " ++ erro)
+                let logFalha = LogEntry tempo Update ("Falha ao atualizar: " ++ idItem) (Falha erro)
+                salvarLog logFalha
+                loop inventario
+            Right (novoInv, logEntry) -> do
+                salvarInventario novoInv
+                salvarLog logEntry
+                putStrLn "Quantidade atualizada!"
+                loop novoInv
+
+    -- CHAMAR EXIBIR
+    chamarShow :: Inventario -> IO ()
+    chamarShow inventario = do
+        putStrLn "Inventário atual:"
+        print inventario
+        loop inventario
+
+    -- CHAMAR SAIR
+    chamarExit :: Inventario -> IO ()
+    chamarExit inventario = do
+        putStrLn "Saindo e salvando dados..."
+        salvarInventario inventario
+        exitSuccess
+
+    -- CHAMAR COMANDO INVALIDO
+    chamarInvalido :: Inventario -> IO ()
+    chamarInvalido inventario = do
+        putStrLn "Comando inválido!"
+        loop inventario
