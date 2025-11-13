@@ -116,6 +116,7 @@ main = do
     putStrLn "=== Sistema de Inventário ==="
     inventario <- lerInventario
     lerAuditoria
+    loop inventario
     where
     -- FUNCOES DE INICIALIZACAO
     
