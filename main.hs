@@ -1,8 +1,15 @@
 module Main where
 
-import Data.Time (UTCTime)
+import Data.Time (UTCTime, getCurrentTime)
 import qualified Data.Map as Map
+import Control.Exception (catch, IOException)
+import Text.Read (readMaybe)
+import System.Directory (doesFileExist)
+import System.IO (hFlush, stdout)
+import System.Exit (exitSuccess)
 
+
+-- TIPOS DE DADOS
 
 -- data cria um novo tipo de dado
 -- deriving (Show, Read) - para permitir a serialização e desserialização de/para o disco.
@@ -48,9 +55,10 @@ data LogEntry = LogEntry
 type ResultadoOperacao = (Inventario, LogEntry)
 
 
+-- FUNCOES PURAS
 
-additem :: UTCTime -> Inventario -> Item -> Either String ResultadoOperacao
-additem t inventario item
+addItem :: UTCTime -> Inventario -> Item -> Either String ResultadoOperacao
+addItem t inventario item
     | Map.member (itemID item) inventario =
         Left "Item já existe no inventário"
     | otherwise =
@@ -65,8 +73,8 @@ additem t inventario item
 
 
 
-removeltem :: UTCTime -> Inventario -> String -> Either String ResultadoOperacao
-removeltem t inventario chave
+removeItem :: UTCTime -> Inventario -> String -> Either String ResultadoOperacao
+removeItem t inventario chave
     | not (Map.member chave inventario) =
         Left "Item não encontrado para remoção"
     | otherwise =
@@ -101,14 +109,31 @@ updateQty t inventario chave novaQtd
             status    = Sucesso
             }
       in Right (inventarioNovo, logEntry)
- 
-      
-      
-      
-      
 
-
-
+-- PONTO DE ENTRADA
 main :: IO ()
 main = do
-  putStrLn "tipos basicos"
+    putStrLn "=== Sistema de Inventário ==="
+    inventario <- lerInventario
+    lerAuditoria
+    where
+    -- FUNCOES DE INICIALIZACAO
+    
+        lerAuditoria :: IO ()
+        lerAuditoria = do
+            existe <- doesFileExist "Auditoria.log"
+            if existe
+              then putStrLn "Arquivo de Auditoria encontrado."
+              else putStrLn "Arquivo de Auditoria não encontrado."
+        
+        lerInventario :: IO Inventario
+        lerInventario = do
+            conteudo <- readFile "Inventario.dat" `catch` handler
+            case readMaybe conteudo of
+                Just inv -> return inv
+                Nothing  -> return Map.empty
+            where
+                handler :: IOException -> IO String
+                handler _ = do
+                    putStrLn "Arquivo Inventario.dat não encontrado. Iniciando inventário vazio..."
+                    return ""
