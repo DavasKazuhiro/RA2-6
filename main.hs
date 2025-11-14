@@ -9,8 +9,10 @@ import System.IO (hFlush, stdout)
 import System.Exit (exitSuccess)
 
 import Data.Maybe (mapMaybe, listToMaybe)
-import Data.List (sort, group, maximumBy, isInfixOf)
+import Data.List (sort, group, maximumBy, isInfixOf, dropWhileEnd)
 import Data.Ord  (comparing)
+import Data.Char (toUpper, toLower, isSpace)
+
 
 -- TIPOS DE DADOS
 
@@ -162,7 +164,16 @@ itemMaisMovimentado allLogs =
         _  -> listToMaybe (maximumBy (comparing length) grupos)
               
               
-              
+
+-- remove espaços em branco 
+trim :: String -> String
+trim = dropWhileEnd isSpace . dropWhile isSpace
+
+-- tira espaços e deixa tudo minúsculo
+normalizaCmd :: String -> String
+normalizaCmd = map toLower . trim
+
+          
 main :: IO ()
 main = do
     putStrLn "=== Sistema de Inventario ==="
@@ -212,7 +223,8 @@ main = do
         putStr "\nComando (add/remove/update/listar/report/exit): "
         hFlush stdout
         comando <- getLine
-        chamarComando comando inventario logs
+        let comandoNorm = normalizaCmd comando
+        chamarComando comandoNorm inventario logs
 
     chamarComando :: String -> Inventario -> [LogEntry] -> IO ()
     chamarComando comando inventario logs
@@ -328,7 +340,8 @@ main = do
     chamarReport inventario logs = do
         putStrLn "\n--- Módulo de Relatorios ---"
         putStr "Escolha o tipo de relatorio (erros / historico / movimentado): " >> hFlush stdout
-        tipoReport <- getLine
+        tipoReportStr <- getLine
+        let tipoReport = normalizaCmd tipoReportStr
 
         case tipoReport of
             "erros"       -> reportarErros logs
