@@ -89,7 +89,7 @@ Todas retornam `Either` para sinalizar falhas sem I/O.
 
 ---
 
-## 💾 Persistência e Auditoria
+## Persistência e Auditoria
 O sistema mantém estado entre execuções utilizando dois arquivos:
 
 | Arquivo | Função |
@@ -97,8 +97,8 @@ O sistema mantém estado entre execuções utilizando dois arquivos:
 | `Inventario.dat` | Persistência do inventário |
 | `Auditoria.log` | Registro de todas as operações, sucesso ou falha |
 
-📌 Em operações bem-sucedidas, o inventário é salvo e o log é gravado  
-📌 Em erro lógico, o inventário é mantido e um LogEntry de falha é registrado
+Em operações bem-sucedidas, o inventário é salvo e o log é gravado  
+Em erro lógico, o inventário é mantido e um LogEntry de falha é registrado
 
 ---
 
@@ -135,7 +135,7 @@ LogEntry {timestamp = 2025-11-14 20:30:19 UTC, acao = Add, detalhes = "Adicionad
 LogEntry {timestamp = 2025-11-14 20:30:42 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"cadeira01\", nome = \"Cadeira Ergonomica\", quantidade = 6, categoria = \"Mobiliario\"}", status = Sucesso}
 LogEntry {timestamp = 2025-11-14 20:30:56 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"webcam01\", nome = \"Webcam Full HD\", quantidade = 9, categoria = \"Video\"}", status = Sucesso}
 ```
-📂 Conteúdo do arquivo Inventario.dat após inserção
+Conteúdo do arquivo Inventario.dat após inserção
 ```haskell
 fromList
   [ ("cadeira01", Item { itemID = "cadeira01", nome = "Cadeira Ergonomica", quantidade = 6, categoria = "Mobiliario" })
@@ -159,7 +159,7 @@ fromList
 3. Sair com `exit`
 4. Abrir novamente e digitar `listar`
 
-📍 **Resultado esperado:** itens persistem
+**Resultado esperado:** itens persistem
 Adição dos itens e fechamento do programa
 <img width="769" height="623" alt="image" src="https://github.com/user-attachments/assets/c8f831e1-767f-4c2a-b2b8-f24102860010" />
 
@@ -175,7 +175,7 @@ Reabertura do programa e listagem
 1. Adicionar teclado01 com quantidade 10
 2. `remove teclado01 15`
 
-📍 **Resultado esperado:** erro exibido, inventário mantido, log de falha salvo
+**Resultado esperado:** erro exibido, inventário mantido, log de falha salvo
 <img width="672" height="416" alt="image" src="https://github.com/user-attachments/assets/ad3be5bc-e527-4825-af0b-e07c62860f0f" />
 
 Log de auditoria:
@@ -190,7 +190,7 @@ LogEntry {timestamp = 2025-11-14 20:46:23.939517971 UTC, acao = Remove, detalhes
 1. Executar `report`
 2. Selecionar `erros`
 
-📍 **Resultado esperado:** falha do cenário 2 listada no relatório
+**Resultado esperado:** falha do cenário 2 listada no relatório
 
 <img width="785" height="283" alt="image" src="https://github.com/user-attachments/assets/8e31ac09-4a68-4d8c-a0af-ce77ebf82f96" />
 
