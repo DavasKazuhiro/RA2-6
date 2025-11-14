@@ -115,8 +115,41 @@ O sistema mantém estado entre execuções utilizando dois arquivos:
 | impressora01 | Impressora Laser | 4 | Impressão |
 | cadeira01 | Cadeira Ergonômica | 6 | Mobiliário |
 | webcam01 | Webcam Full HD | 9 | Vídeo |
+📦 Inserção dos 10 itens iniciais no inventário
+
+📦 Inserção realizada manualmente com o comando `add`.
 
 ---
+
+## 📝 Conteúdo do arquivo `Auditoria.log`
+
+```haskell
+LogEntry {timestamp = 2025-11-14 20:28:02 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"teclado01\", nome = \"Teclado Mecanico\", quantidade = 10, categoria = \"Perifericos\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:28:28 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"mouse01\", nome = \"Mouse Optico\", quantidade = 15, categoria = \"Perifericos\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:28:56 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"monitor01\", nome = \"Monitor 24 polegadas\", quantidade = 5, categoria = \"Monitores\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:29:09 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"headset01\", nome = \"Headset Gamer\", quantidade = 8, categoria = \"Audio\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:29:24 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"notebook01\", nome = \"Notebook i5\", quantidade = 3, categoria = \"Computadores\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:29:46 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"ssd01\", nome = \"SSD 1TB\", quantidade = 12, categoria = \"Armazenamento\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:30:01 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"hd01\", nome = \"HD 2TB\", quantidade = 7, categoria = \"Armazenamento\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:30:19 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"impressora01\", nome = \"Impressora Laser\", quantidade = 4, categoria = \"Impressao\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:30:42 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"cadeira01\", nome = \"Cadeira Ergonomica\", quantidade = 6, categoria = \"Mobiliario\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:30:56 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"webcam01\", nome = \"Webcam Full HD\", quantidade = 9, categoria = \"Video\"}", status = Sucesso}
+```
+📂 Conteúdo do arquivo Inventario.dat após inserção
+```haskell
+fromList
+  [ ("cadeira01", Item { itemID = "cadeira01", nome = "Cadeira Ergonomica", quantidade = 6, categoria = "Mobiliario" })
+  , ("hd01", Item { itemID = "hd01", nome = "HD 2TB", quantidade = 7, categoria = "Armazenamento" })
+  , ("headset01", Item { itemID = "headset01", nome = "Headset Gamer", quantidade = 8, categoria = "Audio" })
+  , ("impressora01", Item { itemID = "impressora01", nome = "Impressora Laser", quantidade = 4, categoria = "Impressao" })
+  , ("monitor01", Item { itemID = "monitor01", nome = "Monitor 24 polegadas", quantidade = 5, categoria = "Monitores" })
+  , ("mouse01", Item { itemID = "mouse01", nome = "Mouse Optico", quantidade = 15, categoria = "Perifericos" })
+  , ("notebook01", Item { itemID = "notebook01", nome = "Notebook i5", quantidade = 3, categoria = "Computadores" })
+  , ("ssd01", Item { itemID = "ssd01", nome = "SSD 1TB", quantidade = 12, categoria = "Armazenamento" })
+  , ("teclado01", Item { itemID = "teclado01", nome = "Teclado Mecanico", quantidade = 10, categoria = "Perifericos" })
+  , ("webcam01", Item { itemID = "webcam01", nome = "Webcam Full HD", quantidade = 9, categoria = "Video" })
+  ]
+```
 
 ## 🧪 Cenários de Teste Manuais (Exigidos pela RA2)
 
