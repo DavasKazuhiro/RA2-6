@@ -3,32 +3,32 @@ Atividade Avaliativa – RA2 — Programação Lógica e Funcional
 
 ---
 
-## 🏫 Instituição e Disciplina
+## Instituição e Disciplina
 **Instituição:** Pontifícia Universidade Católica do Paraná (PUCPR)  
 **Disciplina:** Programação Lógica e Funcional (Turma 4º U) — Ciência da Computação — Noite  
 **Professor:** Frank Coelho de Alcantara
 
 ---
 
-## 🧑‍💻 Integrantes do Grupo (ordem alfabética)
-- **Davi Kazuhiro Natume** — GitHub: https://github.com/DavasKazuhiro  
-- **Felipe Melink Maestri** — GitHub: https://github.com/Fmmaestri  
-- **Lucas Antonio Pelanda** — GitHub: https://github.com/LucasPelanda  
-- **Pedro Henrique Valente Favero** — GitHub: https://github.com/pedrofavero  
+## Integrantes do Grupo 
+- **Davi Kazuhiro Natume** — GitHub: DavasKazuhiro  
+- **Felipe Melink Maestri** — GitHub: Fmmaestri  
+- **Lucas Antonio Pelanda** — GitHub: LucasPelanda  
+- **Pedro Henrique Valente Favero** — GitHub: pedrofavero  
 
 ---
 
-## 🎯 Objetivo Geral
+## Objetivo Geral
 Este projeto implementa um **sistema de gerenciamento de inventário** em **Haskell**, aplicando conceitos de programação funcional, persistência de dados e separação rigorosa entre lógica pura e operações de I/O.
 
 O sistema funciona via **terminal**, registra todo evento em um **arquivo de auditoria** e mantém estado entre execuções através de persistência em disco.
 
 ---
 
-## 🌐 Ambiente de Execução Online
+## Ambiente de Execução Online
 O programa pode ser rodado diretamente no navegador, sem instalações.
 
-🔗 **Link para execução no Online GDB:**  
+**Link para execução no Online GDB:**  
 https://onlinegdb.com/iI2mUr1qEi
 
 ### Como executar
@@ -38,7 +38,7 @@ https://onlinegdb.com/iI2mUr1qEi
 
 ---
 
-## 💻 Comandos Disponíveis
+## Comandos Disponíveis
 
 | Comando | Função |
 |---------|--------|
@@ -51,7 +51,7 @@ https://onlinegdb.com/iI2mUr1qEi
 
 ---
 
-## 🧾 Exemplo de sessão
+## Exemplo de sessão
 === Sistema de Inventario ===
 Comando: add
 ID: teclado01
@@ -67,7 +67,7 @@ Quantidade: 10
 Categoria: Periféricos
 ---
 
-## 🧠 Estrutura Lógica do Sistema
+## Estrutura Lógica do Sistema
 
 ### **Tipos de Dados**
 - **Item** — contém itemID, nome, quantidade e categoria  
@@ -102,7 +102,7 @@ O sistema mantém estado entre execuções utilizando dois arquivos:
 
 ---
 
-## 📦 Dados de Teste (10 itens mínimos exigidos pela RA2)
+## Dados de Teste (10 itens mínimos exigidos pela RA2)
 | ID | Nome | Qtd | Categoria |
 |----|------|-----|-----------|
 | teclado01 | Teclado Mecânico | 10 | Periféricos |
@@ -115,13 +115,13 @@ O sistema mantém estado entre execuções utilizando dois arquivos:
 | impressora01 | Impressora Laser | 4 | Impressão |
 | cadeira01 | Cadeira Ergonômica | 6 | Mobiliário |
 | webcam01 | Webcam Full HD | 9 | Vídeo |
-📦 Inserção dos 10 itens iniciais no inventário
+ Inserção dos 10 itens iniciais no inventário
 
-📦 Inserção realizada manualmente com o comando `add`.
+ Inserção realizada manualmente com o comando `add`.
 
 ---
 
-## 📝 Conteúdo do arquivo `Auditoria.log`
+## Conteúdo do arquivo `Auditoria.log`
 
 ```haskell
 LogEntry {timestamp = 2025-11-14 20:28:02 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"teclado01\", nome = \"Teclado Mecanico\", quantidade = 10, categoria = \"Perifericos\"}", status = Sucesso}
@@ -151,7 +151,7 @@ fromList
   ]
 ```
 
-## 🧪 Cenários de Teste Manuais (Exigidos pela RA2)
+## Cenários de Teste Manuais (Exigidos pela RA2)
 
 ### **Cenário 1 — Persistência**
 1. Rodar o programa sem arquivos existentes
@@ -197,17 +197,12 @@ LogEntry {timestamp = 2025-11-14 20:46:23.939517971 UTC, acao = Remove, detalhes
 
 ---
 
-## 🏁 Conclusão
+## Conclusão
 Este trabalho demonstra domínio de:
 - Programação funcional com Haskell
 - ADTs e expressões condicionais puras
 - Persistência e estados imutáveis
 - Operações de I/O encapsuladas corretamente
 - Sistema funcional completo e testado em ambiente real
-
----
-
-## 📂 Repositório GitHub
-🔗 https://github.com/DavasKazuhiro/RA2-6
 
 ---
