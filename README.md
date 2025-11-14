@@ -29,7 +29,7 @@ O sistema funciona via **terminal**, registra todo evento em um **arquivo de aud
 O programa pode ser rodado diretamente no navegador, sem instalações.
 
 **Link para execução no Online GDB:**  
-https://onlinegdb.com/iI2mUr1qEi
+https://onlinegdb.com/EW1pKufOxt
 
 ### Como executar
 1. Acesse o link acima  
