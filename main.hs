@@ -8,6 +8,9 @@ import System.Directory (doesFileExist)
 import System.IO (hFlush, stdout)
 import System.Exit (exitSuccess)
 
+import Data.Maybe (mapMaybe, listToMaybe)
+import Data.List (sort, group, maximumBy, isInfixOf)
+import Data.Ord  (comparing)
 
 -- TIPOS DE DADOS
 
@@ -109,23 +112,68 @@ updateQty t inventario chave novaQtd
             status    = Sucesso
             }
       in Right (inventarioNovo, logEntry)
+      
+-- FUNCAO DE RELATORIO
+logsDeErro :: [LogEntry] -> [LogEntry]
+logsDeErro allLogs = filter ehErro allLogs
+  where
+    ehErro log = case status log of
+      Falha _ -> True
+      Sucesso -> False
+
+--- dar uma olhada nessas funçoes: 
+
+-- FUNCAO PURA DE RELATORIO
+historicoPorItem :: String -> [LogEntry] -> [LogEntry]
+historicoPorItem itemID allLogs = filter (ehDoItem itemID) allLogs
+  where
+    -- Verifica se o 'detalhe' do log contém o ID do item.
+    -- Esta é uma forma simples; pode falhar se IDs forem substrings de outros.
+    ehDoItem :: String -> LogEntry -> Bool
+    ehDoItem id log = id `isInfixOf` (detalhes log)
 
 
+
+
+-- FUNCAO PURA: Pega o ID da última palavra do 'detalhes'
+extrairID :: LogEntry -> Maybe String
+extrairID log = case acao log of
+    Remove -> Just (last (words (detalhes log)))
+    Update -> Just (last (words (detalhes log)))
+    _      -> Nothing -- Ignora 'Add' e 'QueryFail'
+
+-- FUNCAO PURA: Acha o item mais movimentado
+itemMaisMovimentado :: [LogEntry] -> Maybe String
+itemMaisMovimentado allLogs =
+    let ids     = mapMaybe extrairID allLogs
+        grupos  = group (sort ids)
+    in case grupos of
+        [] -> Nothing
+        _  -> listToMaybe (maximumBy (comparing length) grupos)
+              
+              
+              
 main :: IO ()
 main = do
     putStrLn "=== Sistema de Inventário ==="
     inventario <- lerInventario
-    lerAuditoria
-    loop inventario
+    logs <- lerAuditoria
+    loop inventario logs
   where
     -- FUNCOES DE INICIALIZACAO
 
-    lerAuditoria :: IO ()
+    lerAuditoria :: IO [LogEntry]
     lerAuditoria = do
-        existe <- doesFileExist "Auditoria.log"
-        if existe
-          then putStrLn "Arquivo de Auditoria encontrado."
-          else putStrLn "Arquivo de Auditoria não encontrado."
+            conteudo <- readFile "Auditoria.log" `catch` handler
+            let linhas = lines conteudo
+            let logs = mapMaybe readMaybe linhas
+            putStrLn ("Logs de auditoria carregados: " ++ show (length logs))
+            return logs
+        where
+            handler :: IOException -> IO String
+            handler _ = do
+                putStrLn "Arquivo Auditoria.log não encontrado. Iniciando log vazio..."
+                return ""
 
     lerInventario :: IO Inventario
     lerInventario = do
@@ -149,27 +197,28 @@ main = do
 
     -- LOOP PRINCIPAL
 
-    loop :: Inventario -> IO ()
-    loop inventario = do
-        putStr "\nComando (add/remove/update/show/exit): "
+    loop :: Inventario -> [LogEntry] -> IO ()
+    loop inventario logs = do
+        putStr "\nComando (add/remove/update/show/report/exit): "
         hFlush stdout
         comando <- getLine
-        chamarComando comando inventario
+        chamarComando comando inventario logs
 
-    chamarComando :: String -> Inventario -> IO ()
-    chamarComando comando inventario
-        | comando == "add"    = chamarAdd inventario
-        | comando == "remove" = chamarRemove inventario
-        | comando == "update" = chamarUpdate inventario
-        | comando == "show"   = chamarShow inventario
-        | comando == "exit"   = chamarExit inventario
-        | otherwise           = chamarInvalido inventario
+    chamarComando :: String -> Inventario -> [LogEntry] -> IO ()
+    chamarComando comando inventario logs
+        | comando == "add"    = chamarAdd inventario logs
+        | comando == "remove" = chamarRemove inventario logs
+        | comando == "update" = chamarUpdate inventario logs
+        | comando == "report" = chamarReport inventario logs 
+        | comando == "show"   = chamarShow inventario logs
+        | comando == "exit"   = chamarExit inventario logs
+        | otherwise           = chamarInvalido inventario logs
 
     -- COMANDOS DO LOOP
 
-    -- CHAMAR ADICIONAR
-    chamarAdd :: Inventario -> IO ()
-    chamarAdd inventario = do
+-- CHAMAR ADICIONAR
+    chamarAdd :: Inventario -> [LogEntry] -> IO ()
+    chamarAdd inventario logs = do
         putStr "ID: " >> hFlush stdout
         idItem <- getLine
         putStr "Nome: " >> hFlush stdout
@@ -178,24 +227,31 @@ main = do
         qtdStr <- getLine
         putStr "Categoria: " >> hFlush stdout
         categoria <- getLine
-        let qtd = read qtdStr :: Int
-        tempo <- getCurrentTime
-        let item = Item idItem nome qtd categoria
-        case addItem tempo inventario item of
-            Left erro -> do
-                putStrLn ("Erro: " ++ erro)
-                let logFalha = LogEntry tempo Add ("Falha ao adicionar: " ++ idItem) (Falha erro)
-                salvarLog logFalha
-                loop inventario
-            Right (novoInv, logEntry) -> do
-                salvarInventario novoInv
-                salvarLog logEntry
-                putStrLn "Item adicionado com sucesso!"
-                loop novoInv
+
+        case readMaybe qtdStr :: Maybe Int of
+            Nothing -> do
+                putStrLn "Erro: Quantidade inválida. Insira um número."
+                loop inventario logs-- Volta ao menu sem salvar
+
+            Just qtd -> do -- 'qtd' agora é um Int 
+                -- função original vai aqui dentro
+                tempo <- getCurrentTime
+                let item = Item idItem nome qtd categoria
+                case addItem tempo inventario item of
+                    Left erro -> do
+                        putStrLn ("Erro: " ++ erro)
+                        let logFalha = LogEntry tempo Add ("Falha ao adicionar: " ++ idItem) (Falha erro)
+                        salvarLog logFalha
+                        loop inventario (logFalha : logs)
+                    Right (novoInv, logEntry) -> do
+                        salvarInventario novoInv
+                        salvarLog logEntry
+                        putStrLn "Item adicionado com sucesso!"
+                        loop novoInv (logEntry : logs)
 
     -- CHAMAR REMOVER
-    chamarRemove :: Inventario -> IO ()
-    chamarRemove inventario = do
+    chamarRemove :: Inventario -> [LogEntry] -> IO ()
+    chamarRemove inventario logs = do
         putStr "ID a remover: " >> hFlush stdout
         idRemover <- getLine
         tempo <- getCurrentTime
@@ -204,50 +260,107 @@ main = do
                 putStrLn ("Erro: " ++ erro)
                 let logFalha = LogEntry tempo Remove ("Falha ao remover: " ++ idRemover) (Falha erro)
                 salvarLog logFalha
-                loop inventario
+                loop inventario (logFalha : logs)
             Right (novoInv, logEntry) -> do
                 salvarInventario novoInv
                 salvarLog logEntry
                 putStrLn "Item removido com sucesso!"
-                loop novoInv
+                loop novoInv (logEntry : logs)
 
-    -- CHAMAR ATUALIZAR
-    chamarUpdate :: Inventario -> IO ()
-    chamarUpdate inventario = do
+-- CHAMAR ATUALIZAR
+    chamarUpdate :: Inventario -> [LogEntry] -> IO ()
+    chamarUpdate inventario logs = do
         putStr "ID: " >> hFlush stdout
         idItem <- getLine
         putStr "Nova quantidade: " >> hFlush stdout
         qtdStr <- getLine
-        tempo <- getCurrentTime
-        let novaQtd = read qtdStr :: Int
-        case updateQty tempo inventario idItem novaQtd of
-            Left erro -> do
-                putStrLn ("Erro: " ++ erro)
-                let logFalha = LogEntry tempo Update ("Falha ao atualizar: " ++ idItem) (Falha erro)
-                salvarLog logFalha
-                loop inventario
-            Right (novoInv, logEntry) -> do
-                salvarInventario novoInv
-                salvarLog logEntry
-                putStrLn "Quantidade atualizada!"
-                loop novoInv
 
+        case readMaybe qtdStr :: Maybe Int of
+            Nothing -> do
+                putStrLn "Erro: Quantidade inválida. Insira um número."
+                loop inventario logs
+
+            Just novaQtd -> do -- 'novaQtd' agora é um Int
+                -- função original 
+                tempo <- getCurrentTime
+                case updateQty tempo inventario idItem novaQtd of
+                    Left erro -> do
+                        putStrLn ("Erro: " ++ erro)
+                        let logFalha = LogEntry tempo Update ("Falha ao atualizar: " ++ idItem) (Falha erro)
+                        salvarLog logFalha
+                        loop inventario (logFalha : logs)
+                    Right (novoInv, logEntry) -> do
+                        salvarInventario novoInv
+                        salvarLog logEntry
+                        putStrLn "Quantidade atualizada!"
+                        loop novoInv (logEntry : logs)
+
+-- CHAMAR RELATORIO
+    chamarReport :: Inventario -> [LogEntry] -> IO ()
+    chamarReport inventario logs = do
+        putStrLn "\n--- Módulo de Relatórios ---"
+        putStr "Qual relatório (erros / historico / movimentado): " >> hFlush stdout
+        tipoReport <- getLine
+
+        case tipoReport of
+            "erros"       -> reportarErros logs
+            "historico"   -> reportarHistorico logs
+            "movimentado" -> reportarMaisMovimentado logs
+            _             -> putStrLn "Relatório inválido."
+
+
+        loop inventario logs -- Volta ao loop principal
+      where
+        -- Função auxiliar para o relatório de erros
+        reportarErros :: [LogEntry] -> IO ()
+        reportarErros logs = do
+            putStrLn "\n--- Relatório de Erros de Operação ---"
+            let erros = logsDeErro logs
+            if null erros
+                then putStrLn "Nenhum erro encontrado."
+                else mapM_ (print . formatarLog) erros
+
+        -- Função auxiliar para o histórico de item
+        reportarHistorico :: [LogEntry] -> IO ()
+        reportarHistorico logs = do
+            putStr "Qual o ID do item: " >> hFlush stdout
+            idItem <- getLine
+            putStrLn ("\n--- Histórico para o item: " ++ idItem ++ " ---")
+            let historico = historicoPorItem idItem logs
+            if null historico
+                then putStrLn "Nenhuma movimentação encontrada para este item."
+                else mapM_ (print . formatarLog) historico
+
+        -- Função auxiliar para o item mais movimentado
+        reportarMaisMovimentado :: [LogEntry] -> IO ()
+        reportarMaisMovimentado logs = do
+            putStrLn "\n--- Item Mais Movimentado (Remove/Update) ---"
+            case itemMaisMovimentado logs of
+                Nothing -> putStrLn "Nenhuma movimentação (Remove/Update) registrada."
+                Just idItem -> putStrLn ("O item mais movimentado é: " ++ idItem)
+
+        -- Função auxiliar genérica para formatar
+        formatarLog :: LogEntry -> String
+        formatarLog log = show (acao log) ++ " em " ++ show (timestamp log) ++ ": " ++ detalhes log
+        
+        
+        
     -- CHAMAR EXIBIR
-    chamarShow :: Inventario -> IO ()
-    chamarShow inventario = do
+    chamarShow :: Inventario -> [LogEntry] -> IO ()
+    chamarShow inventario logs = do
         putStrLn "Inventário atual:"
         print inventario
-        loop inventario
+        loop inventario logs
 
     -- CHAMAR SAIR
-    chamarExit :: Inventario -> IO ()
-    chamarExit inventario = do
+    chamarExit :: Inventario -> [LogEntry] -> IO ()
+    chamarExit inventario logs = do
         putStrLn "Saindo e salvando dados..."
         salvarInventario inventario
         exitSuccess
 
     -- CHAMAR COMANDO INVALIDO
-    chamarInvalido :: Inventario -> IO ()
-    chamarInvalido inventario = do
+    chamarInvalido :: Inventario -> [LogEntry] -> IO ()
+    chamarInvalido inventario logs = do
         putStrLn "Comando inválido!"
-        loop inventario
+        loop inventario logs
