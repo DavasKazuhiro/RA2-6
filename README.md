@@ -160,6 +160,14 @@ fromList
 4. Abrir novamente e digitar `listar`
 
 📍 **Resultado esperado:** itens persistem
+Adição dos itens e fechamento do programa
+<img width="769" height="623" alt="image" src="https://github.com/user-attachments/assets/c8f831e1-767f-4c2a-b2b8-f24102860010" />
+
+Reabertura do programa e listagem
+
+<img width="666" height="519" alt="image" src="https://github.com/user-attachments/assets/a2813c11-2a99-49fb-b7c3-29ed7976ec9a" />
+
+
 
 ---
 
@@ -168,6 +176,13 @@ fromList
 2. `remove teclado01 15`
 
 📍 **Resultado esperado:** erro exibido, inventário mantido, log de falha salvo
+<img width="672" height="416" alt="image" src="https://github.com/user-attachments/assets/ad3be5bc-e527-4825-af0b-e07c62860f0f" />
+
+Log de auditoria:
+```haskell
+LogEntry {timestamp = 2025-11-14 20:46:17.231669296 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"teclado01\", nome = \"Teclado Mecanico\", quantidade = 10, categoria = \"Perifericos\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-14 20:46:23.939517971 UTC, acao = Remove, detalhes = "Falha ao remover: ID teclado01", status = Falha "Estoque insuficiente"}
+```
 
 ---
 
@@ -176,6 +191,9 @@ fromList
 2. Selecionar `erros`
 
 📍 **Resultado esperado:** falha do cenário 2 listada no relatório
+
+<img width="785" height="283" alt="image" src="https://github.com/user-attachments/assets/8e31ac09-4a68-4d8c-a0af-ce77ebf82f96" />
+
 
 ---
 
