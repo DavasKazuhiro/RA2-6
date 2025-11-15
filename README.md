@@ -10,7 +10,9 @@ Atividade Avaliativa – RA2 — Programação Lógica e Funcional
 
 ---
 
-## Integrantes do Grupo 
+## Grupo RA2-6
+
+## Integrantes: 
 - **Davi Kazuhiro Natume** — GitHub: DavasKazuhiro  
 - **Felipe Melink Maestri** — GitHub: Fmmaestri  
 - **Lucas Antonio Pelanda** — GitHub: LucasPelanda  
