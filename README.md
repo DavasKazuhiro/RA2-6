@@ -124,31 +124,36 @@ Em erro lógico, o inventário é mantido e um LogEntry de falha é registrado
 ## Conteúdo do arquivo `Auditoria.log`
 
 ```haskell
-LogEntry {timestamp = 2025-11-14 20:28:02 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"teclado01\", nome = \"Teclado Mecanico\", quantidade = 10, categoria = \"Perifericos\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:28:28 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"mouse01\", nome = \"Mouse Optico\", quantidade = 15, categoria = \"Perifericos\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:28:56 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"monitor01\", nome = \"Monitor 24 polegadas\", quantidade = 5, categoria = \"Monitores\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:29:09 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"headset01\", nome = \"Headset Gamer\", quantidade = 8, categoria = \"Audio\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:29:24 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"notebook01\", nome = \"Notebook i5\", quantidade = 3, categoria = \"Computadores\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:29:46 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"ssd01\", nome = \"SSD 1TB\", quantidade = 12, categoria = \"Armazenamento\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:30:01 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"hd01\", nome = \"HD 2TB\", quantidade = 7, categoria = \"Armazenamento\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:30:19 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"impressora01\", nome = \"Impressora Laser\", quantidade = 4, categoria = \"Impressao\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:30:42 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"cadeira01\", nome = \"Cadeira Ergonomica\", quantidade = 6, categoria = \"Mobiliario\"}", status = Sucesso}
-LogEntry {timestamp = 2025-11-14 20:30:56 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"webcam01\", nome = \"Webcam Full HD\", quantidade = 9, categoria = \"Video\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:04:37.216779183 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"teclado01\", nome = \"Teclado Mec\\226nico\", quantidade = 10, categoria = \"Perif\\233ricos\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:04:52.679771721 UTC, acao = QueryFail, detalhes = "Comando invalido digitado", status = Falha "Comando nao reconhecido"}
+LogEntry {timestamp = 2025-11-15 02:06:00.298137648 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"mouse01\", nome = \"Mouse \\211ptico\", quantidade = 15, categoria = \"Perif\\233ricos\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:07:13.159197783 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"monitor01\", nome = \"Monitor 24''\", quantidade = 5, categoria = \"Monitores\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:07:30.152651282 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"headset01\", nome = \"Headset Gamer\", quantidade = 8, categoria = \"\\193udio\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:08:16.019359122 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"notebook01\", nome = \"Notebook i5\", quantidade = 3, categoria = \"Computadores\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:08:35.881261045 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"ssd01\", nome = \"SSD 1TB\", quantidade = 12, categoria = \"Armazenamento\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:09:21.695919549 UTC, acao = QueryFail, detalhes = "Quantidade invalida ao adicionar: asd", status = Falha "Quantidade invalida"}
+LogEntry {timestamp = 2025-11-15 02:09:39.139348862 UTC, acao = QueryFail, detalhes = "Quantidade invalida ao adicionar: a", status = Falha "Quantidade invalida"}
+LogEntry {timestamp = 2025-11-15 02:09:57.169007721 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"hd01\", nome = \"HD 2TB\", quantidade = 7, categoria = \"Armazenamento\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:10:17.344714616 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"impressora01\", nome = \"Impressora Laser\", quantidade = 4, categoria = \"Impress\\227o\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:10:38.493251846 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"cadeira01\", nome = \"Cadeira Ergon\\244mica\", quantidade = 6, categoria = \"Mobili\\225rio\"}", status = Sucesso}
+LogEntry {timestamp = 2025-11-15 02:11:08.566997087 UTC, acao = Add, detalhes = "Adicionado: Item {itemID = \"webcam01\", nome = \"Webcam Full HD\", quantidade = 9, categoria = \"V\\237deo\"}", status = Sucesso}
+
 ```
 Conteúdo do arquivo Inventario.dat após inserção
 ```haskell
 fromList
-  [ ("cadeira01", Item { itemID = "cadeira01", nome = "Cadeira Ergonomica", quantidade = 6, categoria = "Mobiliario" })
-  , ("hd01", Item { itemID = "hd01", nome = "HD 2TB", quantidade = 7, categoria = "Armazenamento" })
-  , ("headset01", Item { itemID = "headset01", nome = "Headset Gamer", quantidade = 8, categoria = "Audio" })
-  , ("impressora01", Item { itemID = "impressora01", nome = "Impressora Laser", quantidade = 4, categoria = "Impressao" })
-  , ("monitor01", Item { itemID = "monitor01", nome = "Monitor 24 polegadas", quantidade = 5, categoria = "Monitores" })
-  , ("mouse01", Item { itemID = "mouse01", nome = "Mouse Optico", quantidade = 15, categoria = "Perifericos" })
-  , ("notebook01", Item { itemID = "notebook01", nome = "Notebook i5", quantidade = 3, categoria = "Computadores" })
-  , ("ssd01", Item { itemID = "ssd01", nome = "SSD 1TB", quantidade = 12, categoria = "Armazenamento" })
-  , ("teclado01", Item { itemID = "teclado01", nome = "Teclado Mecanico", quantidade = 10, categoria = "Perifericos" })
-  , ("webcam01", Item { itemID = "webcam01", nome = "Webcam Full HD", quantidade = 9, categoria = "Video" })
-  ]
+[
+("cadeira01",Item {itemID = "cadeira01", nome = "Cadeira Ergon\244mica", quantidade = 6, categoria = "Mobili\225rio"}),
+("hd01",Item {itemID = "hd01", nome = "HD 2TB", quantidade = 7, categoria = "Armazenamento"}),
+("headset01",Item {itemID = "headset01", nome = "Headset Gamer", quantidade = 8, categoria = "\193udio"}),
+("impressora01",Item {itemID = "impressora01", nome = "Impressora Laser", quantidade = 4, categoria = "Impress\227o"}),
+("monitor01",Item {itemID = "monitor01", nome = "Monitor 24''", quantidade = 5, categoria = "Monitores"}),
+("mouse01",Item {itemID = "mouse01", nome = "Mouse \211ptico", quantidade = 15, categoria = "Perif\233ricos"}),
+("notebook01",Item {itemID = "notebook01", nome = "Notebook i5", quantidade = 3, categoria = "Computadores"}),
+("ssd01",Item {itemID = "ssd01", nome = "SSD 1TB", quantidade = 12, categoria = "Armazenamento"}),
+("teclado01",Item {itemID = "teclado01", nome = "Teclado Mec\226nico", quantidade = 10, categoria = "Perif\233ricos"}),
+("webcam01",Item {itemID = "webcam01", nome = "Webcam Full HD", quantidade = 9, categoria = "V\237deo"})
+]
 ```
 
 ## Cenários de Teste Manuais (Exigidos pela RA2)
